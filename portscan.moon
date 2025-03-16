@@ -14,15 +14,24 @@ export ulPrint= (s)->   print "\027[4m"..s.."\027[0m"
 export reversePrint=(s)-> print "\027[7m"..s.."\027[0m"
 export colPrint=(s,c)-> print "\027[#{c}m"..s.."\027[0m"
 --> returnTokens returns a string with color tokens added unto it.
---> example print(cRet("hi world",COL.red))
+--> example print(returnTokens("hi world",COL.red))
 export returnTokens=(s,c)-> return "\027[#{tostring(c)}m"..tostring(s).."\027[0m"
    
 -- END --------------------------------------------------------------------------------------------------------------------------------------------
 
 --- misc functions
 export tinsert=table.insert
-export lentbl = (t) -> return #t
 
+export lentbl = (t) -> return #t
+export ping = (host,port) ->
+	cli=sock\tcp!
+	cli\settimeout(1)
+	if not cli\connect(host,port) then
+		return false
+	else
+		-- TODO Determine response time and service from response
+		cli\shutdown!
+		return true
 -- Class Defs Below =========================================================================================================================
 
 export class PortScanTask
@@ -40,7 +49,7 @@ export class PortScanTask
     reversePrint "Scanning #{@hostip} (#{@host}),#{#@ports_to_scan} ports in queue"
     italPrint "Using connect timeout of #{@connect_timeout} seconds."
 		-- TODO Needs delay here !!!
-    for iport in *@ports_to_scan
+    for port in *@ports_to_scan
       colPrint "trying to connect to port #{iport} (#{@host})...",COL.blue
       cli=sock\tcp!
       cli\settimeout(@connect_timeout)
@@ -100,7 +109,7 @@ a_port_range_end = arg[3]
 a_timeout=arg[4]
 --------------------------------
 
-export p=PortScanTask(a_host,a_portlow,a_porthigh,a_timeout)
+export p=PortScanTask(a_host,a_portlow,a_porthigh)
 
 p\easy_scan_range!
 p\test_ports_rx!
